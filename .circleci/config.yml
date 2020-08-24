@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  deploy:
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "b2:58:a4:3b:01:b1:45:6a:58:4a:5a:90:18:d9:66:4b"
+      - run:
+          name: fix host authenticity for production server
+          command: ssh-keyscan 13.232.83.152 >> ~/.ssh/known_hosts
+      - run:
+          name: deploy app
+          command: ssh -t ubuntu@13.232.83.152 " cd /app/gazapp-api && git pull origin master && sh deploy.sh "
+workflows:
+  version: 2
+  build:
+    jobs:
+      - deploy
